@@ -1,24 +1,69 @@
 // @generated: @expo/next-adapter@2.1.0
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import AuthService from "../services/auth-service";
+import Nav from "../components/Nav";
+import { StyleSheet, View } from "react-native";
+import EnrolledCourses from "../components/EnrolledCourses";
+import AllCourses from "../components/AllCourses";
+import MyCourses from "../components/MyCourses";
 
-const App = () => {
+const Index = () => {
+  const [currentView, setCurrentView] = useState("enrolled");
+
+  const router = useRouter();
+
+  useEffect(() => {
+    (async () => {
+      const isLoggedIn = await AuthService.isLoggedIn();
+      if (!isLoggedIn) {
+        router.push("/auth");
+      }
+    })();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Welcome to Expo + Next.js 👋</Text>
-    </View>
+    <>
+      <Nav
+        items={[
+          {
+            name: "Enrolled courses",
+            onPress: () => setCurrentView("enrolled"),
+          },
+          {
+            name: "All courses",
+            onPress: () => setCurrentView("all"),
+          },
+          {
+            name: "My courses",
+            onPress: () => setCurrentView("my"),
+          },
+        ]}
+      />
+      <View style={styles.main}>
+        {(() => {
+          switch (currentView) {
+            case "enrolled":
+              return <EnrolledCourses />;
+            case "all":
+              return <AllCourses />;
+            case "my":
+              return <MyCourses />;
+            default:
+              return false;
+          }
+        })()}
+      </View>
+    </>
   );
 };
 
-export default App;
+export default Index;
 
 const styles = StyleSheet.create({
-  container: {
+  main: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-  },
-  text: {
-    fontSize: 16,
+    justifyContent: "center",
   },
 });
