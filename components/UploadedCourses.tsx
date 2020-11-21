@@ -3,9 +3,10 @@ import defaultStyles from "../helpers/default-styles";
 import React, { useEffect, useState } from "react";
 import CourseService from "../services/course-service";
 import CoursePreview from "./CoursePreview";
+import { Course } from "../helpers/entities";
 
 const UploadedCourses = () => {
-  const [courses, setCourses] = useState<any>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
     let unsubscribe = null;
@@ -28,7 +29,11 @@ const UploadedCourses = () => {
         data={courses}
         keyExtractor={(course) => course.id}
         renderItem={({ item: course }) => (
-          <CoursePreview course={course} buttonTitle="edit" />
+          <CoursePreview
+            course={course}
+            buttonTitle="view"
+            buttonPath={`course/${course.id}`}
+          />
         )}
       />
     </View>

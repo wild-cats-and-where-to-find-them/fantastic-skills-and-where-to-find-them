@@ -22,6 +22,15 @@ export default class CourseService {
       .set({ name, tags, videoUrls: [url], featuredUrl: url, teacherId });
   }
 
+  static parseCourse(doc, id) {
+    const ratings = (doc.data().ratings ?? {}) as { [_: string]: number };
+    const ownRating = ratings[id];
+    const ratingAverage =
+      Object.values(ratings).reduce((a, b) => a + b, 0) /
+      Object.keys(ratings).length;
+    return { ...doc.data(), id: doc.id, ownRating, ratingAverage } as Course;
+  }
+
   static async onCoursesForTeacherUpdate(
     callback: (courses: Course[]) => void
   ) {
@@ -31,9 +40,7 @@ export default class CourseService {
       .collection("courses")
       .where("teacherId", "==", teacherId)
       .onSnapshot((snapshot) => {
-        callback(
-          snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Course))
-        );
+        callback(snapshot.docs.map((doc) => this.parseCourse(doc, teacherId)));
       });
   }
 
@@ -53,7 +60,7 @@ export default class CourseService {
               const flag = doc.data().participants?.includes(userId);
               return enrolled ? flag : !flag;
             })
-            .map((doc) => ({ ...doc.data(), id: doc.id } as Course))
+            .map((doc) => this.parseCourse(doc, userId))
         );
       });
   }
@@ -69,14 +76,32 @@ export default class CourseService {
       });
   }
 
-  static async getCourse(id: string) {
+  static async getCourse(
+    id: string
+  ): Promise<{ course: Course; isCreator: boolean }> {
     const userId = await AuthService.getUserID();
     const doc = await firebase.firestore().collection("courses").doc(id).get();
-    if (!doc.data().participants?.includes(userId)) {
+    const isCreator = doc.data().teacherId === userId;
+    if (!doc.data().participants?.includes(userId) && !isCreator) {
       const error = new Error() as any;
       error.code = "course/not-enrolled";
       throw error;
     }
-    return { ...doc.data(), id: doc.id } as Course;
+    return {
+      course: this.parseCourse(doc, userId),
+      isCreator,
+    };
+  }
+
+  static async rateCourse(id: string, index: number) {
+    const userId = await AuthService.getUserID();
+    const key = `ratings.${userId}`;
+    await firebase
+      .firestore()
+      .collection("courses")
+      .doc(id)
+      .update({
+        [key]: index,
+      });
   }
 }

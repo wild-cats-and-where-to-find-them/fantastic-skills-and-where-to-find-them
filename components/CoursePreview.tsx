@@ -27,7 +27,11 @@ const CoursePreview = ({
         resizeMode="cover"
       />
       <View style={styles.nameContainer}>
-        <Text style={styles.name}>{course.name}</Text>
+        <Text style={styles.name}>
+          {course.name}
+          {!isNaN(course.ratingAverage) &&
+            ` - ${course.ratingAverage.toFixed(2)}⭐️`}
+        </Text>
       </View>
       <View style={styles.tagsContainer}>
         {course.tags.map((tag) => (

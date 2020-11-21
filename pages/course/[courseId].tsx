@@ -7,17 +7,27 @@ import CourseService from "../../services/course-service";
 import { useRouter } from "next/router";
 import defaultStyles from "../../helpers/default-styles";
 import ChatService from "../../services/chat-service";
+import { Hoverable } from "react-native-web-hooks";
 
 const CoursePage = ({ courseId }) => {
-  const [course, setCourse] = useState<Course | null>(null);
+  const [courseObj, setCourseObj] = useState<{
+    course: Course;
+    isCreator: boolean;
+  } | null>(null);
+  const { course, isCreator } = courseObj || {};
   const [question, setQuestion] = useState("");
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
+  const [clickedIndex, setClickedIndex] = useState(-1);
   const router = useRouter();
 
   useEffect(() => {
     (async () => {
       try {
         const course = await CourseService.getCourse(courseId);
-        setCourse(course);
+        setCourseObj(course);
+        if (course.course.ownRating) {
+          setClickedIndex(course.course.ownRating);
+        }
       } catch (error) {
         if (error.code === "course/not-enrolled") {
           router.back();
@@ -26,7 +36,7 @@ const CoursePage = ({ courseId }) => {
     })();
   }, []);
 
-  if (!course) {
+  if (!courseObj) {
     return <View />;
   }
 
@@ -44,15 +54,46 @@ const CoursePage = ({ courseId }) => {
         resizeMode="cover"
         useNativeControls
       />
-      <TextInput
-        style={[defaultStyles.input, styles.input]}
-        placeholder="Something unclear? Ask a question..."
-        value={question}
-        onChangeText={(text) => setQuestion(text)}
-      />
-      <Pressable style={defaultStyles.button} onPress={send}>
-        <Text>Send</Text>
-      </Pressable>
+      {!isCreator && (
+        <>
+          <Text style={defaultStyles.title}>Rate this course</Text>
+          <View style={styles.rating}>
+            {[...Array(5)]
+              .map((_, index) => index)
+              .map((index) => (
+                <Hoverable
+                  key={index}
+                  onHoverIn={() => setHoveredIndex(index)}
+                  onHoverOut={() => setHoveredIndex(-1)}
+                >
+                  {(_isHovered) => (
+                    <Pressable
+                      onPress={() => {
+                        setClickedIndex(index);
+                        CourseService.rateCourse(course.id, index);
+                      }}
+                      style={[
+                        styles.bullet,
+                        (clickedIndex >= index || hoveredIndex >= index) && {
+                          backgroundColor: "black",
+                        },
+                      ]}
+                    />
+                  )}
+                </Hoverable>
+              ))}
+          </View>
+          <TextInput
+            style={[defaultStyles.input, styles.input]}
+            placeholder="Something unclear? Ask a question..."
+            value={question}
+            onChangeText={(text) => setQuestion(text)}
+          />
+          <Pressable style={defaultStyles.button} onPress={send}>
+            <Text>Send</Text>
+          </Pressable>
+        </>
+      )}
     </View>
   );
 };
@@ -71,6 +112,17 @@ const styles = StyleSheet.create({
   input: {
     width: 300,
     marginTop: 25,
+  },
+  rating: {
+    flexDirection: "row",
+  },
+  bullet: {
+    width: 25,
+    height: 25,
+    backgroundColor: "gray",
+    borderRadius: 100,
+    marginHorizontal: 10,
+    cursor: "pointer",
   },
 });
 

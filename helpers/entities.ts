@@ -5,6 +5,8 @@ type Course = {
   videoUrls: string[];
   id: string;
   teacherId: string;
+  ratingAverage: number;
+  ownRating?: number;
 };
 
 type Chat = {
