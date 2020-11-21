@@ -7,6 +7,12 @@ const defaultStyles = StyleSheet.create({
     borderBottomWidth: 1,
     width: "100%",
   },
+  inputTop: {
+    height: 50,
+    borderTopColor: "black",
+    borderTopWidth: 1,
+    width: "100%",
+  },
   button: {
     backgroundColor: "salmon",
     width: 100,

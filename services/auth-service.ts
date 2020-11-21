@@ -54,4 +54,9 @@ export default class AuthService {
   static logout() {
     return firebase.auth().signOut();
   }
+
+  static async getUsernameById(id: string) {
+    const query = await firebase.firestore().collection("users").doc(id).get();
+    return query.data().username;
+  }
 }

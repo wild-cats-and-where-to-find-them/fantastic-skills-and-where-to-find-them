@@ -7,6 +7,7 @@ import { StyleSheet, View } from "react-native";
 import EnrolledCourses from "../components/EnrolledCourses";
 import AllCourses from "../components/AllCourses";
 import MyCourses from "../components/MyCourses";
+import Chat from "../components/Chat";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState("enrolled");
@@ -27,6 +28,10 @@ const Index = () => {
       <Nav
         items={[
           {
+            name: "Chat",
+            onPress: () => setCurrentView("chat"),
+          },
+          {
             name: "Enrolled courses",
             onPress: () => setCurrentView("enrolled"),
           },
@@ -43,6 +48,8 @@ const Index = () => {
       <View style={styles.main}>
         {(() => {
           switch (currentView) {
+            case "chat":
+              return <Chat />;
             case "enrolled":
               return <EnrolledCourses />;
             case "all":

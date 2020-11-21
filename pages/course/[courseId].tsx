@@ -1,14 +1,16 @@
 import { GetServerSideProps } from "next";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Video } from "expo-av";
 import { Course } from "../../helpers/entities";
 import CourseService from "../../services/course-service";
 import { useRouter } from "next/router";
 import defaultStyles from "../../helpers/default-styles";
+import ChatService from "../../services/chat-service";
 
 const CoursePage = ({ courseId }) => {
   const [course, setCourse] = useState<Course | null>(null);
+  const [question, setQuestion] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -28,6 +30,7 @@ const CoursePage = ({ courseId }) => {
     return <View />;
   }
 
+  const send = () => ChatService.sendOrCreate(course.teacherId, question);
   return (
     <View style={styles.main}>
       <Text style={defaultStyles.title}>{course.name}</Text>
@@ -41,6 +44,15 @@ const CoursePage = ({ courseId }) => {
         resizeMode="cover"
         useNativeControls
       />
+      <TextInput
+        style={[defaultStyles.input, styles.input]}
+        placeholder="Something unclear? Ask a question..."
+        value={question}
+        onChangeText={(text) => setQuestion(text)}
+      />
+      <Pressable style={defaultStyles.button} onPress={send}>
+        <Text>Send</Text>
+      </Pressable>
     </View>
   );
 };
@@ -55,6 +67,10 @@ const styles = StyleSheet.create({
   video: {
     width: "50%",
     height: 300,
+  },
+  input: {
+    width: 300,
+    marginTop: 25,
   },
 });
 

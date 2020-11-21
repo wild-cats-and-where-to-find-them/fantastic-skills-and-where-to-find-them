@@ -31,7 +31,7 @@ const CoursePreview = ({
       </View>
       <View style={styles.tagsContainer}>
         {course.tags.map((tag) => (
-          <View style={styles.tag}>
+          <View key={tag} style={styles.tag}>
             <Text>{tag}</Text>
           </View>
         ))}
