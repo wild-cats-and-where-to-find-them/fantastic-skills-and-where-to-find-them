@@ -37,6 +37,15 @@ export default class ChatService {
     }
   }
 
+  static async createNewTopicChat(topic: string) {
+    const ref = await firebase.firestore().collection("chats").add({
+      topic,
+      messages: [],
+      participants: [],
+    });
+    return ref.id;
+  }
+
   static async sendMessageToChat(id: string, text: string) {
     const userId = await AuthService.getUserID();
     const message = {
@@ -49,9 +58,12 @@ export default class ChatService {
       .firestore()
       .collection("chats")
       .doc(id)
-      .update({
-        messages: FieldValue.arrayUnion(message),
-      });
+      .set(
+        {
+          messages: FieldValue.arrayUnion(message),
+        },
+        { merge: true }
+      );
   }
 
   static async getConversationsForUser() {
@@ -96,11 +108,8 @@ export default class ChatService {
       .where("topic", "==", topic);
     const docs = await query.get();
     if (docs.docs.length !== 1) {
-      await firebase.firestore().collection("chats").add({
-        topic,
-        participants: [],
-        messages: [],
-      });
+      callback(null);
+      return null;
     }
     return query.onSnapshot(async (snapshot) => {
       const data = await this.processChatsSnapshot(userId, snapshot, true);

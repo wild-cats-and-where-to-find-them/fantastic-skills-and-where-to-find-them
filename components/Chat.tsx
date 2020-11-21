@@ -38,7 +38,17 @@ const ChatPage = () => {
   }, []);
 
   const send = async () => {
-    await ChatService.sendMessageToChat(shownChat.id, message);
+    if (shownChat.id === "") {
+      const id = await ChatService.createNewTopicChat(query);
+      await ChatService.sendMessageToChat(id, message);
+      topicUnsubscribe?.current?.();
+      topicUnsubscribe.current = await ChatService.onTopicChatUpdate(
+        query,
+        (chat) => setShownChat(chat)
+      );
+    } else {
+      await ChatService.sendMessageToChat(shownChat.id, message);
+    }
     setMessage("");
   };
 
@@ -48,7 +58,15 @@ const ChatPage = () => {
     topicUnsubscribe.current = await ChatService.onTopicChatUpdate(
       text,
       (chat) => {
-        setShownChat(chat);
+        setShownChat(
+          chat ??
+            ({
+              id: "",
+              messages: [],
+              otherId: "",
+              otherUsername: "",
+            } as Chat)
+        );
       }
     );
   };
