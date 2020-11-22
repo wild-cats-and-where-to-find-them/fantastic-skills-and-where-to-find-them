@@ -75,7 +75,7 @@ const ChatPage = () => {
     <View style={styles.main}>
       <TextInput
         style={defaultStyles.input}
-        placeholder="search"
+        placeholder="search topic"
         value={query}
         onChangeText={(text) => onSearch(text)}
       />

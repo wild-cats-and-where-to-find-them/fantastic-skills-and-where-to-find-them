@@ -23,7 +23,7 @@ const EnrolledCourses = () => {
 
   return (
     <View style={styles.main}>
-      <Text style={defaultStyles.title}>Enrolled courses</Text>
+      <Text style={defaultStyles.title}>My board</Text>
       <FlatList
         horizontal
         style={styles.courses}

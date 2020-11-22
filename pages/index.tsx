@@ -1,9 +1,7 @@
-// @generated: @expo/next-adapter@2.1.0
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import AuthService from "../services/auth-service";
 import Nav from "../components/Nav";
-import { StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import EnrolledCourses from "../components/EnrolledCourses";
 import AllCourses from "../components/AllCourses";
 import MyCourses from "../components/MyCourses";
@@ -11,17 +9,41 @@ import Chat from "../components/Chat";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState("enrolled");
-
-  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     (async () => {
       const isLoggedIn = await AuthService.isLoggedIn();
-      if (!isLoggedIn) {
-        router.push("/auth");
-      }
+      setIsLoggedIn(isLoggedIn);
     })();
   }, []);
+
+  if (isLoggedIn === null) {
+    return <View />;
+  }
+
+  if (isLoggedIn === false) {
+    return (
+      <>
+        <Nav
+          items={[
+            {
+              name: "Login/Register",
+              path: "/auth",
+            },
+          ]}
+          noLogout
+        />
+        <Image
+          style={{ flex: 1, resizeMode: "contain" }}
+          source={{
+            uri:
+              "https://firebasestorage.googleapis.com/v0/b/skills-2b9bd.appspot.com/o/first_page.png?alt=media&token=65a8108a-1b34-485e-835a-7f23f3ea8cd4",
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -32,7 +54,7 @@ const Index = () => {
             onPress: () => setCurrentView("chat"),
           },
           {
-            name: "Enrolled courses",
+            name: "My board",
             onPress: () => setCurrentView("enrolled"),
           },
           {

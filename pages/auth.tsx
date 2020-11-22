@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Pressable, View, Text, StyleSheet, TextInput } from "react-native";
+import {
+  Pressable,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Image,
+} from "react-native";
 import AuthService from "../services/auth-service";
 import { useRouter } from "next/router";
 import defaultStyles from "../helpers/default-styles";
@@ -33,6 +40,13 @@ const Auth = () => {
     <>
       <Nav items={[]} noLogout />
       <View style={styles.main}>
+        <Image
+          style={{ width: 300, height: 169 }}
+          source={{
+            uri:
+              "https://firebasestorage.googleapis.com/v0/b/skills-2b9bd.appspot.com/o/create_acc.png?alt=media&token=790855cb-3628-4a0f-bfe3-d85af7e77f82",
+          }}
+        />
         <View style={styles.authContainer}>
           <Pressable style={styles.authType}>
             <Text style={defaultStyles.title}>

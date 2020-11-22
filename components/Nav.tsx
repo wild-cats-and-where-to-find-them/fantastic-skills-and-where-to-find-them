@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import AuthService from "../services/auth-service";
 import { useRouter } from "next/router";
+import { useDimensions } from "react-native-web-hooks";
 
 type NavItem = {
   name: string;
@@ -12,6 +13,10 @@ type NavItem = {
 
 const Nav = ({ items, noLogout }: { items: NavItem[]; noLogout?: boolean }) => {
   const router = useRouter();
+  const {
+    window: { width },
+  } = useDimensions();
+  const isMobile = () => width < 700;
 
   const _items = [
     ...items,
@@ -25,7 +30,12 @@ const Nav = ({ items, noLogout }: { items: NavItem[]; noLogout?: boolean }) => {
   ].filter(Boolean);
 
   return (
-    <View style={styles.nav}>
+    <View
+      style={[
+        styles.nav,
+        isMobile() && { flexDirection: "column", height: "auto" },
+      ]}
+    >
       <Image
         source={{
           uri:
@@ -33,10 +43,15 @@ const Nav = ({ items, noLogout }: { items: NavItem[]; noLogout?: boolean }) => {
         }}
         style={styles.logo}
       />
-      <View style={styles.navItems}>
+      <View
+        style={[
+          styles.navItems,
+          isMobile() && { width: "100%", flexDirection: "column" },
+        ]}
+      >
         {_items.map((item) => {
           const inner = (
-            <View style={styles.navItem}>
+            <View style={[styles.navItem, isMobile() && { width: "100%" }]}>
               <Text>{item.name}</Text>
             </View>
           );

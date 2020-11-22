@@ -19,6 +19,11 @@ const AddCourse = () => {
 
   const upload = async () => {
     await CourseService.uploadCourse(uri, data.name, data.tags.split(" "));
+    setData({
+      name: "",
+      tags: "",
+    });
+    setUri(null);
   };
 
   return (
@@ -28,7 +33,7 @@ const AddCourse = () => {
         {Object.keys(data).map((key) => (
           <TextInput
             key={key}
-            placeholder={key}
+            placeholder={key === "tags" ? "tags (separated by space)" : key}
             value={data[key]}
             onChangeText={(text) =>
               setData((data) => ({ ...data, [key]: text }))

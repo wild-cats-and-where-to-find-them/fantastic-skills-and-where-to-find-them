@@ -24,7 +24,7 @@ const CoursePreview = ({
         isLooping
         isMuted={true}
         rate={1.0}
-        resizeMode="cover"
+        resizeMode="contain"
       />
       <View style={styles.nameContainer}>
         <Text style={styles.name}>
@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   video: {
-    marginHorizontal: 15,
     width: 300,
     height: 300,
   },
